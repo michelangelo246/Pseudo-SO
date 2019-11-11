@@ -51,7 +51,7 @@ void Executa()
             //aumenta tempo de espera de todos processos prontos que nao executaram
             //Processo::Priority_Boost();
 
-            //executa operacoes
+            //executa operacoes; se for de tempo real, todas; se for de usuario, ate o quantum acabar;
             if(processo->prioridade_base == Processo::TEMPO_REAL)
             {
                 while(!processo->terminou())
@@ -99,6 +99,12 @@ int main(int argc, char **argv)
     Arquivo::Inicializa(argv[2]);
     Processo::le_Arquivo_Operacoes(argv[2]);
 
+    //loop principal: 
+    // 1. inicializa processos caso seja a hora
+    // 2. move processos bloquados para a fila de prontos caso possivel
+    // 3. executa processo pronto de maior prioridade
+    // 4. envia processo de usuario para o fim da mesma fila apos executar
+    // 5. aumenta a prioridade dos processos que nao conseguiram executar
     do{
         Processo::Inicializa();
         Processo::Verifica_Bloquados();
@@ -107,6 +113,7 @@ int main(int argc, char **argv)
     }
     while(!Processo::Terminou());
 
+    //Exibe estado final do sistema de arquivos
     Arquivo::Imprime();
 
     return 0;

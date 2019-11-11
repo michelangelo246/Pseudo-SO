@@ -12,11 +12,6 @@ Processo::~Processo()
     this->lista_operacoes.clear();
 }
 
-void Processo::Insere(Processo *processo)
-{
-    Processo::processos_lidos.push_back(processo);
-}
-
 /*Retorna o processo pelo PID ou NULL caso ele nao exista*/
 Processo *Processo::Get(int PID)
 {
@@ -53,6 +48,7 @@ bool Processo::Terminou()
     return true;
 }
 
+/*Le arquivos de operações, inserindo as operacoes na lista do processo correspondente e inicializa a memoria*/
 void Processo::le_Arquivo_Operacoes(const string &filename)
 {
     //le arquivo de operacoes
@@ -113,6 +109,7 @@ void Processo::le_Arquivo_Operacoes(const string &filename)
     }
 }
 
+/*Le arquivo de processos e os insere em uma lista de processos lidos*/
 void Processo::le_Arquivo_Processo(const string &filename)
 {
     ifstream arquivo(filename);
@@ -178,26 +175,8 @@ void Processo::le_Arquivo_Processo(const string &filename)
             processo->tempo_esperando = 0;
             processo->prioridade_variavel = 3;
             processo->PID = pid++;
-            Processo::Insere(processo);
+            Processo::processos_lidos.push_back(processo);
         }
-    }
-}
-
-void Processo::imprime_Processos()
-{
-    for(list<Processo*>::iterator it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
-    {
-        cout << "tempo de inicializacao: " << (*it)->tempo_inicializacao << endl;
-        cout << "prioridade base:        " << (*it)->prioridade_base << endl;
-        cout << "tempo necessario:       " << (*it)->tempo_processador << endl;
-        cout << "tamanho na RAM:         " << (*it)->qtd_blocos << endl;
-
-        cout << "usa impressora 1:       " << (*it)->recursos[Processo::impressora_1] << endl;
-        cout << "usa impressora 2:       " << (*it)->recursos[Processo::SATA_2] << endl;
-        cout << "usa scanner:            " << (*it)->recursos[Processo::scanner] << endl;
-        cout << "usa modem:              " << (*it)->recursos[Processo::modem] << endl;
-        cout << "usa SATA 1:            " << (*it)->recursos[Processo::SATA_1] << endl;
-        cout << "usa SATA 2:            " << (*it)->recursos[Processo::SATA_2] << endl << endl;
     }
 }
 
@@ -221,6 +200,7 @@ void Processo::imprime_Processo(Processo *processo)
     cout << endl << endl;
 }
 
+/*Verifica se processo pode alocar os recursos e a memoria necessarios para executar*/
 bool Processo::Pode_executar(Processo *processo)
 {
     if(!Memoria::Pode_alocar(processo->prioridade_base, processo->qtd_blocos))
@@ -234,6 +214,7 @@ bool Processo::Pode_executar(Processo *processo)
     return true;
 }
 
+/*verifica se o processo executou o tempo maximo determinado*/
 bool Processo::terminou()
 {
     return this->tempo_executado == this->tempo_processador;

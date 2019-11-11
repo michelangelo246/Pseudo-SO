@@ -56,14 +56,12 @@ public:
 
     static int tempo_decorrido;
 
-    static void Insere(Processo *processo);
     static Processo *Get(int PID);
     static bool Pode_executar(Processo *processo);
     static void Inicializa();
     static void Verifica_Bloquados();
     static void Priority_Boost();
     static bool Terminou();
-    static void imprime_Processos();
     static void imprime_Processo(Processo *processo);
     static void le_Arquivo_Processo(const string &filename);
     static void le_Arquivo_Operacoes(const string &filename);
