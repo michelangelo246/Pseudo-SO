@@ -2,6 +2,7 @@
 
 bool Memoria::RAM[1024];
 
+/*Inicializa os blocos da memoria RAM como livres*/
 void Memoria::Inicializa()
 {
     for(int i=0; i<1024; i++)
@@ -10,6 +11,7 @@ void Memoria::Inicializa()
     }
 }
 
+/*verifica se ha a possibilidade de alocar a quantidade de blocos solicitadas no segmento da prioridade informada*/
 bool Memoria::Pode_alocar(int prioridade, int qtd_blocos)
 {
     bool cabe;
@@ -71,6 +73,7 @@ bool Memoria::Pode_alocar(int prioridade, int qtd_blocos)
     return false;
 }
 
+/*Aloca a quantidade de blocos especificada no segmento da prioridade e retorna o offset da posicao de alocacao*/
 int Memoria::Aloca(int prioridade, int qtd_blocos)
 {
     bool cabe;
@@ -144,6 +147,7 @@ int Memoria::Aloca(int prioridade, int qtd_blocos)
     }
 }
 
+/*Libera a memoria na quantidade de blocos especificada a partir do offset informado*/
 void Memoria::Desaloca(int offset, int qtd_blocos)
 {
     for(int i=offset; i<qtd_blocos; i++)

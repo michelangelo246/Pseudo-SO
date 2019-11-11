@@ -16,6 +16,7 @@ Arquivo::~Arquivo()
     Arquivo::arquivos.remove(this);
 }
 
+/*Le arquivos contendo as operacoes (somente a parte inicial com arquivos iniciais)*/
 void Arquivo::le_Arquivo_Operacoes(const string &filename)
 {
     //le arquivo de operacoes
@@ -58,6 +59,7 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
     }
 }
 
+/*Exibe estado atual do sistema de arquivos*/
 void Arquivo::Imprime()
 {
 

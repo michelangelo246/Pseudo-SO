@@ -48,7 +48,7 @@ bool Processo::Terminou()
     return true;
 }
 
-/*Le arquivos de operações, inserindo as operacoes na lista do processo correspondente e inicializa a memoria*/
+/*Le arquivos de operações (somente parte de operacoes), inserindo as operacoes na lista do processo correspondente e inicializa a memoria*/
 void Processo::le_Arquivo_Operacoes(const string &filename)
 {
     //le arquivo de operacoes
