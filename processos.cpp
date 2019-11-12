@@ -15,7 +15,7 @@ Processo::~Processo()
 /*Retorna o processo pelo PID ou NULL caso ele nao exista*/
 Processo *Processo::Get(int PID)
 {
-    for(list<Processo*>::iterator it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
+    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
     {
         if((*it)->PID == PID)
         {
@@ -252,7 +252,7 @@ void Processo::Priority_Boost()
 /*Move processos lidos para as filas de prontos ou bloqueados, se for na de prontos, aloca os recursos necessarios*/
 void Processo::Inicializa()
 {
-    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
+    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end();)
     {
         //se esta na hora de inicializar o processo
         if(Processo::tempo_decorrido == (*it)->tempo_inicializacao)
@@ -285,6 +285,11 @@ void Processo::Inicializa()
             //tira da fila de processos lidos
             it = Processo::processos_lidos.erase(it);
         }
+        else
+        {
+            it++;
+        }
+        
     }
 }
 
