@@ -235,6 +235,8 @@ void Processo::Priority_Boost()
                 (*it)->tempo_esperando = 0;
                 //coloca processo na fila de maior prioridade
                 Processo::fila_prontos[i-1].push_back((*it));
+                //aumenta campo relativo a prioridade
+                (*it)->prioridade_variavel=i-1;
                 //tira processo da fila atual
                 it = Processo::fila_prontos[i].erase(it);
             }
