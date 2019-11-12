@@ -20,25 +20,25 @@ Arquivo::~Arquivo()
 void Arquivo::le_Arquivo_Operacoes(const string &filename)
 {
     //le arquivo de operacoes
-    ifstream arquivo(filename);
-    Arquivo *arquivo_tmp;
+    ifstream arquivo_entrada(filename);
+    Arquivo *arquivo_tmp = nullptr;
     string linha;
     int hd_size, aux_lines, aux, aux_offset;
     char c, tmp;
 
-    if (arquivo.is_open())
+    if (arquivo_entrada.is_open())
     {
-        getline(arquivo, linha);
+        getline(arquivo_entrada, linha);
         istringstream in1(linha);
         in1 >> hd_size;
 
-        getline(arquivo, linha);
+        getline(arquivo_entrada, linha);
         istringstream in2(linha);
         in2 >> aux_lines;
 
         for(int i=0; i<aux_lines; i++)
         {
-            getline(arquivo, linha);
+            getline(arquivo_entrada, linha);
             istringstream in(linha);
             arquivo_tmp = new Arquivo();
 
@@ -54,8 +54,10 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
                 Arquivo::HD[aux_offset++] = true;
             }
             Arquivo::arquivos.push_back(arquivo_tmp);
+
+            arquivo_tmp = nullptr;
         }
-        arquivo.close();
+        arquivo_entrada.close();
     }
 }
 
@@ -107,7 +109,7 @@ void Arquivo::Inicializa(const string &filename)
     }
 }
 
-/*Retorna o arquivo com o nome especificado ou NULL caso o arquivo nao exista*/
+/*Retorna o arquivo com o nome especificado ou nullptr caso o arquivo nao exista*/
 Arquivo* Arquivo::Get(char filename)
 {
     for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++)
@@ -117,7 +119,7 @@ Arquivo* Arquivo::Get(char filename)
             return (*it);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /*Executa a operacao no topo da pilha de operacoes do processo*/
@@ -227,5 +229,5 @@ void Arquivo::executa(int PID,int cod_op, char nome_arquivo, int qtd_blocos, int
 void Arquivo::Free()
 {
     free(HD);
-    HD = NULL;
+    HD = nullptr;
 }

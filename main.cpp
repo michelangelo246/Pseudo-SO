@@ -27,6 +27,7 @@ void executa_prox_op(Processo *processo)
         cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
     }
     processo->tempo_executado++;
+    processo->prioridade_variavel = processo->prioridade_base;
 }
 
 /*percorre filas de prontos, executa a operacao daquele que possui maior prioridade e o insere no final da fila*/
@@ -110,7 +111,7 @@ void Executa()
             {
                 cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - FAIL";
                 cout << "\nO quantum de processamento foi esgotado!" << endl << endl;
-                Processo::fila_prontos[i].push_back(processo);
+                Processo::fila_prontos[processo->prioridade_base].push_back(processo);
             }
             break;
         }
@@ -124,7 +125,7 @@ int main(int argc, char **argv)
     Arquivo::le_Arquivo_Operacoes(argv[2]);
     Processo::le_Arquivo_Operacoes(argv[2]);
 
-    //loop principal: 
+    //loop principal:
     // 1. inicializa processos caso seja a hora
     // 2. move processos bloquados para a fila de prontos caso possivel
     // 3. executa processo pronto de maior prioridade
@@ -139,6 +140,7 @@ int main(int argc, char **argv)
 
     //Exibe estado final do sistema de arquivos
     Arquivo::Imprime();
+    cout << endl;
     Arquivo::Free();
 
     return 0;
