@@ -1,6 +1,6 @@
 #include "arquivos.hpp"
 #include "processos.hpp"
-
+#include <string.h>
 list<Arquivo*> Arquivo::arquivos;
 bool *Arquivo::HD;
 int Arquivo::HD_SIZE = 0;
@@ -9,10 +9,7 @@ int Arquivo::HD_SIZE = 0;
 Arquivo::~Arquivo()
 {
     //desaloca memoria ocupada pelo arquivo
-    for(int i=this->offset; i<this->qtd_blocos; i++)
-    {
-        HD[i]=false;
-    }
+    memset(HD+this->offset, false, this->qtd_blocos * sizeof(bool));
     //remove arquivo da lista de arquivos
     Arquivo::arquivos.remove(this);
 }
@@ -24,7 +21,7 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
     ifstream arquivo_entrada(filename);
     Arquivo *arquivo_tmp = nullptr;
     string linha;
-    int hd_size, aux_lines, aux, aux_offset;
+    int hd_size, aux_lines, aux;
     char c, tmp;
 
     if (arquivo_entrada.is_open())
@@ -37,28 +34,20 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
         istringstream in2(linha);
         in2 >> aux_lines;
 
-        for(int i=0; i<aux_lines; i++)
+        for(int i = 0; i < aux_lines; i++)
         {
             getline(arquivo_entrada, linha);
             istringstream in(linha);
             arquivo_tmp = new Arquivo();
 
-            in >> tmp >> c;
-            arquivo_tmp->nome = tmp;
-            in >> aux_offset >> c;
-            arquivo_tmp->offset = aux_offset;
-            in >> aux >> c;
-            arquivo_tmp->qtd_blocos = aux;
-
-            for(int j=0; j<arquivo_tmp->qtd_blocos; j++)
-            {
-                Arquivo::HD[aux_offset++] = true;
-            }
+            in >> arquivo_tmp->nome >> c;
+            in >> arquivo_tmp->offset >> c;
+            in >> arquivo_tmp->qtd_blocos >> c;
+            memset(Arquivo::HD + arquivo_tmp->offset, true, arquivo_tmp-> qtd_blocos * sizeof(bool) );
             Arquivo::arquivos.push_back(arquivo_tmp);
 
             arquivo_tmp = nullptr;
         }
-        arquivo_entrada.close();
     }
 }
 
@@ -101,13 +90,9 @@ void Arquivo::Inicializa(const string &filename)
     istringstream in1(linha);
     in1 >> hd_size;
     Arquivo::HD_SIZE = hd_size;
-    Arquivo::HD = (bool*)malloc(hd_size*sizeof(bool));
-
     //inicia espacos do HD como livres
-    for(int i=0; i<Arquivo::HD_SIZE; i++)
-    {
-        HD[i] = false;
-    }
+    Arquivo::HD = (bool*)calloc(hd_size, sizeof(bool));
+
 }
 
 /*Retorna o arquivo com o nome especificado ou nullptr caso o arquivo nao exista*/
