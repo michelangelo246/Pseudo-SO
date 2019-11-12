@@ -136,6 +136,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
             //info basica
             processo->tempo_inicializacao = raw_processo[0];
             processo->prioridade_base = raw_processo[1];
+            assert(processo->prioridade_base >= 0 and processo->prioridade_base <= 3);
             processo->tempo_processador = raw_processo[2];
             processo->qtd_blocos = raw_processo[3];
             //recursos
@@ -175,7 +176,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
             processo->offset = -1;
             processo->tempo_executado = 0;
             processo->tempo_esperando = 0;
-            processo->prioridade_variavel = 3;
+            processo->prioridade_variavel = processo->prioridade_base;
             processo->PID = pid++;
             Processo::processos_lidos.push_back(processo);
         }
@@ -239,7 +240,7 @@ void Processo::Priority_Boost()
                 //coloca processo na fila de maior prioridade
                 Processo::fila_prontos[i-1].push_back(processo);
                 //aumenta campo relativo a prioridade
-                processo->prioridade_variavel=i-1;
+                processo->prioridade_variavel = i-1;
                 //tira processo da fila atual
                 it = Processo::fila_prontos[i].erase(it);
             }
