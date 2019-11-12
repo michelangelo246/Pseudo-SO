@@ -258,7 +258,7 @@ void Processo::Inicializa()
     for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end();)
     {
         //se esta na hora de inicializar o processo
-        if(Processo::tempo_decorrido <= (*it)->tempo_inicializacao)
+        if(Processo::tempo_decorrido >= (*it)->tempo_inicializacao)
         {
             //se processo tem tudo o que precisa para executar, vai para fila de prontos
             if(Processo::Pode_executar(*it))
@@ -266,6 +266,7 @@ void Processo::Inicializa()
                 if((*it)->prioridade_base == Processo::TEMPO_REAL)
                 {
                     Processo::fila_prontos[0].push_back(*it);
+                    break;
                 }
                 else
                 {
@@ -287,6 +288,8 @@ void Processo::Inicializa()
             }
             //tira da fila de processos lidos
             it = Processo::processos_lidos.erase(it);
+            //inicializar um processo consome um clock do processador
+            Processo::tempo_decorrido++;
         }
         else
         {

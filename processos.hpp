@@ -60,7 +60,7 @@ public:
     //constantes
     static const int TEMPO_REAL = 0;
     static const int USUARIO = 1;
-    static const int QUANTUM = 3;
+    static const int QUANTUM = 2;
     static const int WAIT_TIME = 2;
 
     static Processo *Get(int PID);
