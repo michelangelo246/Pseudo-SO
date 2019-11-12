@@ -26,9 +26,6 @@ void executa_prox_op(Processo *processo)
     {
         cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
     }
-
-    //incrementa tempo de execucao
-    processo->tempo_executado++;
 }
 
 /*percorre filas de prontos, executa a operacao daquele que possui maior prioridade e o insere no final da fila*/
@@ -78,7 +75,7 @@ void Executa()
                 while(!processo->terminou())
                 {
                     executa_prox_op(processo);
-                    //cada execução consome um tempo de clock
+                    //cada execução consome um ciclo de clock
                     Processo::tempo_decorrido++;
                 }
             }
@@ -87,6 +84,7 @@ void Executa()
                 for(int j=0; (j<Processo::QUANTUM)&&(!processo->terminou()); j++)
                 {
                     executa_prox_op(processo);
+                    //cada execução consome um ciclo de clock
                     Processo::tempo_decorrido++;
                 }
             }
