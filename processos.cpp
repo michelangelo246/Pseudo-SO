@@ -29,12 +29,10 @@ bool Processo::Terminou()
 {
     if(!Processo::fila_bloqueados.empty())
     {
-        cout <<"tem bloquado";
         return false;
     }
     else if(!Processo::processos_lidos.empty())
     {
-        cout <<"tem lido";
         return false;
     }
     else
@@ -265,6 +263,18 @@ void Processo::Inicializa()
                 if((*it)->prioridade_base == Processo::TEMPO_REAL)
                 {
                     Processo::fila_prontos[0].push_back(*it);
+                    //aloca os recursos e memoria para o processo movido para a fila de prontos
+                    Recursos::Aloca((*it)->recursos);
+                    (*it)->offset = Memoria::Aloca((*it)->prioridade_base, (*it)->qtd_blocos);
+    
+                    //imprime processo pelo dispatcher apos inicializa-lo
+                    Processo::imprime_Processo((*it));
+                    
+                    //tira da fila de processos lidos
+                    it = Processo::processos_lidos.erase(it);
+                    
+                    //inicializar um processo consome um clock do processador
+                    Processo::tempo_decorrido++;
                     break;
                 }
                 else
