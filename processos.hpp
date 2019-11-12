@@ -60,8 +60,8 @@ public:
     //constantes
     static const int TEMPO_REAL = 0;
     static const int USUARIO = 1;
-    static const int QUANTUM = 2;
-    static const int WAIT_TIME = 2;
+    static const int QUANTUM = 4;
+    static const int WAIT_TIME = 1;
 
     static Processo *Get(int PID);
     static bool Pode_executar(Processo *processo);

@@ -71,10 +71,10 @@ void Executa() {
                 //informa que as operacoes especificadas para execucao apos encerramento serao abortadas
                 cout << "PID: " << processo->PID << "  - TERMINATED " ;
                 if(!processo->lista_operacoes.empty()) {
-                    cout << "\nSuas operacoes restantes foram abortadas!" << endl << endl;
+                    cout << "\nO processo " << processo->PID << " esgotou o seu tempo de CPU! " << endl << endl;
                 }
                 else {
-                    cout << "\nTodas as suas operacoes foram executadas!" << endl << endl;
+                    cout << "\nO processo " << processo->PID << " executou todas as suas operacoes! " << endl << endl;
                 }
                 delete(processo);
             }
