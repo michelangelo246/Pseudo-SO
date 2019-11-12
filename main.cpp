@@ -34,7 +34,23 @@ void executa_prox_op(Processo *processo)
 /*percorre filas de prontos, executa a operacao daquele que possui maior prioridade e o insere no final da fila*/
 void Executa()
 {
+    //referencia para o processo a ser executado
     Processo *processo;
+    bool vazia = true;
+
+    //necessario para a incrementação do clock mesmo quando todas as filas de pronto estiverem vazias
+    for(int i=0; i<4; i++)
+    {
+        if(!Processo::fila_prontos[i].empty())
+        {
+            vazia = false;
+        }
+    }
+    if(vazia == true)
+    {
+        Processo::tempo_decorrido++;
+        return ;
+    }
 
     /*Percorre as filas de prontos seguindo a prioridade*/
     for(int i=0; i<4; i++)
@@ -71,10 +87,11 @@ void Executa()
                 for(int j=0; (j<Processo::QUANTUM)&&(!processo->terminou()); j++)
                 {
                     executa_prox_op(processo);
+                    Processo::tempo_decorrido++;
                 }
             }
 
-            //se processo ainda nao terminou, devolve no final da fila de prontos
+            //se processo de usuario ainda nao terminou, devolve no final da fila de prontos
             if(processo->terminou())
             {
                 //informa que as operacoes especificadas para execucao apos encerramento serao abortadas
@@ -89,6 +106,7 @@ void Executa()
                 }
                 delete(processo);
             }
+            //processo de usuario nao terminou pois foi preemptado por esgotamento de quantum
             else
             {
                 cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - FAIL";
@@ -117,7 +135,6 @@ int main(int argc, char **argv)
         Processo::Inicializa();
         Processo::Verifica_Bloquados();
         Executa();
-        Processo::tempo_decorrido++;
     }
     while(!Processo::Terminou());
 
