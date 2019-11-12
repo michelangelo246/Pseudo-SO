@@ -84,9 +84,9 @@ void Arquivo::Inicializa(const string &filename) {
 
 /*Retorna o arquivo com o nome especificado ou nullptr caso o arquivo nao exista*/
 Arquivo* Arquivo::Get(char filename) {
-    for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++) {
-        if((*it)->nome == filename) {
-            return (*it);
+    for(auto arquivo : Arquivo::arquivos) {
+        if(arquivo->nome == filename) {
+            return arquivo;
         }
     }
     return nullptr;
