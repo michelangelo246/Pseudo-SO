@@ -223,20 +223,25 @@ bool Processo::terminou()
 /*Move processos de usuario que estao esperando ha um tempo para filas com maior prioridade*/
 void Processo::Priority_Boost()
 {
-    //so pode mover processo de usuario (>0) que nao esta no maior nivel de prioridade variavel
-    for(int i=1; i<3; i++)
+    //so pode mover processo de usuario (>1) que nao esta no maior nivel de prioridade variavel
+    for(int i=2; i<4; i++)
     {
-        for(list<Processo*>::iterator it = Processo::fila_prontos[i].begin(); it != Processo::fila_prontos[i].end(); it++)
+        for(auto it = Processo::fila_prontos[i].begin(); it != Processo::fila_prontos[i].end();)
         {
             //se processo esta esperando ha muito tempo
             if((*it)->tempo_esperando >= Processo::WAIT_TIME)
             {
-                //tira processo da fila atual
-                it = Processo::fila_prontos[i].erase(it);
-                //coloca processo na fila de maior prioridade
-                Processo::fila_prontos[i+1].push_back((*it));
                 //reseta tempo de espera do processo movido
                 (*it)->tempo_esperando = 0;
+                //coloca processo na fila de maior prioridade
+                Processo::fila_prontos[i-1].push_back((*it));
+                //tira processo da fila atual
+                it = Processo::fila_prontos[i].erase(it);
+            }
+            else
+            {
+                //evita incremento duplicado devido ao erase
+                it++;
             }
         }
     }

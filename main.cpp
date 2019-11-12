@@ -49,7 +49,7 @@ void Executa()
             processo->tempo_esperando = 0;
 
             //aumenta tempo de espera de todos processos prontos que nao executaram
-            //Processo::Priority_Boost();
+            Processo::Priority_Boost();
 
             //executa operacoes; se for de tempo real, todas; se for de usuario, ate o quantum acabar;
             if(processo->prioridade_base == Processo::TEMPO_REAL)
