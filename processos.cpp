@@ -43,7 +43,6 @@ bool Processo::Terminou()
         {
             if(!Processo::fila_prontos[i].empty())
             {
-                cout <<"tem pronto";
                 return false;
             }
         }
