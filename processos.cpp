@@ -1,4 +1,5 @@
 #include "processos.hpp"
+#include <assert.h>
 
 list<Processo*> Processo::processos_lidos;
 list<Processo*> Processo::fila_prontos[4];

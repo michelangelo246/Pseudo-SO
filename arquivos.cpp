@@ -129,72 +129,72 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
     int cabe, aux;
 
     switch(cod_op){
-        case Arquivo::CRIAR:
-            for(int i=0; i<Arquivo::HD_SIZE; i++) {
-                //encontrou segmento livre
-                if(HD[i] == false) {
-                    cabe = true;
-                    //ve se cabe arquivo
-                    for(int j=0; j<qtd_blocos; j++) {
-                        //se nao cabe, continua procurando
-                        if((j+i) >= Arquivo::HD_SIZE or HD[j+i] == true) {
-                            i = j+i;
-                            cabe = false;
-                            break;
-                        }
-                    }
-                    //se percorreu os blocos e cabe
-                    if(cabe == true) {
-                        aux = i;
-                        //aloca os espacos e cria o arquivo
-                        for(int j=0; j<qtd_blocos; j++) HD[i++] = true;
-                        arquivo = new Arquivo();
-                        arquivo->nome = nome_arquivo;
-                        arquivo->offset = aux;
-                        arquivo->qtd_blocos = qtd_blocos;
-                        arquivo->PID_owner = PID;
-                        Arquivo::arquivos.push_back(arquivo);
-                        cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
-                        cout << "O processo criou o arquivo " << arquivo->nome ;
-                        cout << " (blocos " ;
-                        for(int k = arquivo->offset; k < arquivo->offset + arquivo->qtd_blocos; k++) {
-                            cout << k;
-                            if(k < arquivo->offset + arquivo->qtd_blocos-1) cout << " e ";
-                        }
-                        cout << ")" << endl << endl;
+    case Arquivo::CRIAR:
+        for(int i=0; i<Arquivo::HD_SIZE; i++) {
+            //encontrou segmento livre
+            if(HD[i] == false) {
+                cabe = true;
+                //ve se cabe arquivo
+                for(int j=0; j<qtd_blocos; j++) {
+                    //se nao cabe, continua procurando
+                    if((j+i) >= Arquivo::HD_SIZE or HD[j+i] == true) {
+                        i = j+i;
+                        cabe = false;
                         break;
                     }
                 }
+                //se percorreu os blocos e cabe
+                if(cabe == true) {
+                    aux = i;
+                    //aloca os espacos e cria o arquivo
+                    for(int j=0; j<qtd_blocos; j++) HD[i++] = true;
+                    arquivo = new Arquivo();
+                    arquivo->nome = nome_arquivo;
+                    arquivo->offset = aux;
+                    arquivo->qtd_blocos = qtd_blocos;
+                    arquivo->PID_owner = PID;
+                    Arquivo::arquivos.push_back(arquivo);
+                    cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
+                    cout << "O processo criou o arquivo " << arquivo->nome ;
+                    cout << " (blocos " ;
+                    for(int k = arquivo->offset; k < arquivo->offset + arquivo->qtd_blocos; k++) {
+                        cout << k;
+                        if(k < arquivo->offset + arquivo->qtd_blocos-1) cout << " e ";
+                    }
+                    cout << ")" << endl << endl;
+                    break;
+                }
             }
-            if(cabe == false) {
-                cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
-                cout << "O processo nao pode criar o arquivo ";
-                cout << nome_arquivo << " por falta de espaco" << endl << endl;
-            }
-            break;
-        case Arquivo::EXCLUIR:
-            //Se arquivo nao existe
-            if(not Arquivo::Get(nome_arquivo)) {
-                cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
-                cout << "O processo nao pode deletar o arquivo ";
-                cout << nome_arquivo << " porque nao existe esse arquivo" << endl << endl;
+        }
+        if(cabe == false) {
+            cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
+            cout << "O processo nao pode criar o arquivo ";
+            cout << nome_arquivo << " por falta de espaco" << endl << endl;
+        }
+        break;
+    case Arquivo::EXCLUIR:
+        //Se arquivo nao existe
+        if(not Arquivo::Get(nome_arquivo)) {
+            cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
+            cout << "O processo nao pode deletar o arquivo ";
+            cout << nome_arquivo << " porque nao existe esse arquivo" << endl << endl;
+        }
+        else {
+            //processo de tempo real pode excluir qualquer arquivo
+            //processo dono pode excluir o arquivo
+            if((prioridade_base == Processo::TEMPO_REAL) or (PID == Arquivo::Get(nome_arquivo)->PID_owner)) {
+                delete Arquivo::Get(nome_arquivo);
+                cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
+                cout << "O processo deletou o arquivo ";
+                cout << nome_arquivo << endl << endl;
             }
             else {
-                //processo de tempo real pode excluir qualquer arquivo
-                //processo dono pode excluir o arquivo
-                if((prioridade_base == Processo::TEMPO_REAL) or (PID == Arquivo::Get(nome_arquivo)->PID_owner)) {
-                    delete Arquivo::Get(nome_arquivo);
-                    cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
-                    cout << "O processo deletou o arquivo ";
-                    cout << nome_arquivo << endl << endl;
-                }
-                else {
-                    cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
-                    cout << "O processo nao pode deletar o arquivo ";
-                    cout << nome_arquivo << " pois nao o criou" << endl << endl;
-                }
+                cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
+                cout << "O processo nao pode deletar o arquivo ";
+                cout << nome_arquivo << " pois nao o criou" << endl << endl;
             }
-            break;
+        }
+        break;
     }
 }
 
