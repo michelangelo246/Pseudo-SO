@@ -52,13 +52,13 @@ void Arquivo::Imprime() {
 
     for(int i=0; i<Arquivo::HD_SIZE; i++) {
         if(HD[i] == true) {
-            for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++) {
-                if((*it)->offset == i) {
-                    for(int j=0; j<(*it)->qtd_blocos; j++) {
-                        cout << (*it)->nome << "|";
+            for(auto arquivo : Arquivo::arquivos) {
+                if(arquivo->offset == i) {
+                    for(int j=0; j<arquivo->qtd_blocos; j++) {
+                        cout << arquivo->nome << "|";
                     }
+                    i = arquivo->offset + arquivo->qtd_blocos;
                     break;
-                    i = (*it)->offset + (*it)->qtd_blocos;
                 }
             }
         } else {
