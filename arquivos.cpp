@@ -6,8 +6,7 @@ bool *Arquivo::HD;
 int Arquivo::HD_SIZE = 0;
 
 /*Libera memoria alocada por arquivo*/
-Arquivo::~Arquivo()
-{
+Arquivo::~Arquivo() {
     //desaloca memoria ocupada pelo arquivo
     memset(HD+this->offset, false, this->qtd_blocos * sizeof(bool));
     //remove arquivo da lista de arquivos
@@ -15,8 +14,7 @@ Arquivo::~Arquivo()
 }
 
 /*Le arquivos contendo as operacoes (somente a parte inicial com arquivos iniciais)*/
-void Arquivo::le_Arquivo_Operacoes(const string &filename)
-{
+void Arquivo::le_Arquivo_Operacoes(const string &filename) {
     //le arquivo de operacoes
     ifstream arquivo_entrada(filename);
     Arquivo *arquivo_tmp = nullptr;
@@ -24,8 +22,7 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
     int hd_size, aux_lines, aux;
     char c, tmp;
 
-    if (arquivo_entrada.is_open())
-    {
+    if (arquivo_entrada.is_open()) {
         getline(arquivo_entrada, linha);
         istringstream in1(linha);
         in1 >> hd_size;
@@ -34,8 +31,7 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
         istringstream in2(linha);
         in2 >> aux_lines;
 
-        for(int i = 0; i < aux_lines; i++)
-        {
+        for(int i = 0; i < aux_lines; i++) {
             getline(arquivo_entrada, linha);
             istringstream in(linha);
             arquivo_tmp = new Arquivo();
@@ -52,36 +48,27 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename)
 }
 
 /*Exibe estado atual do sistema de arquivos*/
-void Arquivo::Imprime()
-{
+void Arquivo::Imprime() {
 
-    for(int i=0; i<Arquivo::HD_SIZE; i++)
-    {
-        if(HD[i] == true)
-        {
-            for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++)
-            {
-                if((*it)->offset == i)
-                {
-                    for(int j=0; j<(*it)->qtd_blocos; j++)
-                    {
+    for(int i=0; i<Arquivo::HD_SIZE; i++) {
+        if(HD[i] == true) {
+            for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++) {
+                if((*it)->offset == i) {
+                    for(int j=0; j<(*it)->qtd_blocos; j++) {
                         cout << (*it)->nome << "|";
                     }
                     break;
                     i = (*it)->offset + (*it)->qtd_blocos;
                 }
             }
-        }
-        else
-        {
+        } else {
             cout << "_|";
         }
     }
 }
 
 /*Inicializa espacos do HD*/
-void Arquivo::Inicializa(const string &filename)
-{
+void Arquivo::Inicializa(const string &filename) {
     ifstream arquivo(filename);
     string linha;
     int hd_size;
@@ -96,12 +83,9 @@ void Arquivo::Inicializa(const string &filename)
 }
 
 /*Retorna o arquivo com o nome especificado ou nullptr caso o arquivo nao exista*/
-Arquivo* Arquivo::Get(char filename)
-{
-    for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++)
-    {
-        if((*it)->nome == filename)
-        {
+Arquivo* Arquivo::Get(char filename) {
+    for(list<Arquivo*>::iterator it = Arquivo::arquivos.begin(); it != Arquivo::arquivos.end(); it++) {
+        if((*it)->nome == filename) {
             return (*it);
         }
     }
@@ -109,11 +93,11 @@ Arquivo* Arquivo::Get(char filename)
 }
 
 /*Executa a operacao no topo da pilha de operacoes do processo*/
-void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, int tempo_de_efetivacao, int tempo_executado, int prioridade_base){
+void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, int tempo_de_efetivacao, int tempo_executado, int prioridade_base) {
     Arquivo *arquivo = nullptr;
     int cabe, aux;
 
-    switch(cod_op){
+    switch(cod_op) {
     case Arquivo::CRIAR:
         for(int i=0; i<Arquivo::HD_SIZE; i++) {
             //encontrou segmento livre
@@ -132,7 +116,8 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
                 if(cabe == true) {
                     aux = i;
                     //aloca os espacos e cria o arquivo
-                    for(int j=0; j<qtd_blocos; j++) HD[i++] = true;
+                    for(int j=0; j<qtd_blocos; j++)
+                        HD[i++] = true;
                     arquivo = new Arquivo();
                     arquivo->nome = nome_arquivo;
                     arquivo->offset = aux;
@@ -144,7 +129,8 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
                     cout << " (blocos " ;
                     for(int k = arquivo->offset; k < arquivo->offset + arquivo->qtd_blocos; k++) {
                         cout << k;
-                        if(k < arquivo->offset + arquivo->qtd_blocos-1) cout << " e ";
+                        if(k < arquivo->offset + arquivo->qtd_blocos-1)
+                            cout << " e ";
                     }
                     cout << ")" << endl << endl;
                     break;
@@ -163,8 +149,7 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
             cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
             cout << "O processo nao pode deletar o arquivo ";
             cout << nome_arquivo << " porque nao existe esse arquivo" << endl << endl;
-        }
-        else {
+        } else {
             //processo de tempo real pode excluir qualquer arquivo
             //processo dono pode excluir o arquivo
             if((prioridade_base == Processo::TEMPO_REAL) or (PID == Arquivo::Get(nome_arquivo)->PID_owner)) {
@@ -172,8 +157,7 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
                 cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
                 cout << "O processo deletou o arquivo ";
                 cout << nome_arquivo << endl << endl;
-            }
-            else {
+            } else {
                 cout << "PID: " << PID << " - instruction " << tempo_executado << " - FAIL (IO)" << endl;
                 cout << "O processo nao pode deletar o arquivo ";
                 cout << nome_arquivo << " pois nao o criou" << endl << endl;
@@ -183,7 +167,7 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
     }
 }
 
-void Arquivo::Free(){
+void Arquivo::Free() {
     free(HD);
     HD = nullptr;
 }

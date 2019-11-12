@@ -9,14 +9,14 @@ void executa_prox_op(Processo *processo) {
         //se esta na hora de executar a prox operacao
         if(processo->tempo_executado == processo->lista_operacoes.front().tempo_de_efetivacao) {
             Arquivo::executa(processo->PID,processo->lista_operacoes.front().cod_op,
-                    processo->lista_operacoes.front().nome_arquivo, processo->lista_operacoes.front().qtd_blocos,
-                    processo->lista_operacoes.front().tempo_de_efetivacao, processo->tempo_executado,
-                    processo->prioridade_base);
+                             processo->lista_operacoes.front().nome_arquivo, processo->lista_operacoes.front().qtd_blocos,
+                             processo->lista_operacoes.front().tempo_de_efetivacao, processo->tempo_executado,
+                             processo->prioridade_base);
             processo->lista_operacoes.pop_front();
-        }
-        else cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
-    }
-    else cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
+        } else
+            cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
+    } else
+        cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
     processo->tempo_executado++;
     processo->prioridade_variavel = processo->prioridade_base;
 }
@@ -28,7 +28,9 @@ void Executa() {
     bool vazia = true;
 
     //necessario para a incrementação do clock mesmo quando todas as filas de pronto estiverem vazias
-    for(int i=0; i<4; i++) if(!Processo::fila_prontos[i].empty()) vazia = false;
+    for(int i=0; i<4; i++)
+        if(!Processo::fila_prontos[i].empty())
+            vazia = false;
     if(vazia == true) {
         Processo::tempo_decorrido++;
         return ;
@@ -48,17 +50,16 @@ void Executa() {
             Processo::Priority_Boost();
 
             //executa operacoes; se for de tempo real, todas; se for de usuario, ate o quantum acabar;
-            if(processo->prioridade_base == Processo::TEMPO_REAL)
-            {
+            if(processo->prioridade_base == Processo::TEMPO_REAL) {
                 //necessario para evitar incremento excedente do tempo_decorrido
-                if(!processo->terminou()) Processo::tempo_decorrido--;
+                if(!processo->terminou())
+                    Processo::tempo_decorrido--;
                 while(!processo->terminou()) {
                     executa_prox_op(processo);
                     //cada execução consome um ciclo de clock
                     Processo::tempo_decorrido++;
                 }
-            }
-            else {
+            } else {
                 for(int j=0; (j<Processo::QUANTUM)&&(!processo->terminou()); j++) {
                     executa_prox_op(processo);
                     //cada execução consome um ciclo de clock
@@ -72,8 +73,7 @@ void Executa() {
                 cout << "PID: " << processo->PID << "  - TERMINATED " ;
                 if(!processo->lista_operacoes.empty()) {
                     cout << "\nO processo " << processo->PID << " esgotou o seu tempo de CPU! " << endl << endl;
-                }
-                else {
+                } else {
                     cout << "\nO processo " << processo->PID << " executou todas as suas operacoes! " << endl << endl;
                 }
                 delete(processo);
@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     // 3. executa processo pronto de maior prioridade
     // 3.1. envia processo de usuario para o fim da mesma fila apos executar
     // 3.2. aumenta a prioridade dos processos que nao conseguiram executar
-    do{
+    do {
         Processo::Inicializa();
         Processo::Verifica_Bloquados();
         Executa();

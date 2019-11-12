@@ -13,8 +13,7 @@
 
 using namespace std;
 
-class Operacao
-{
+class Operacao {
 public:
 
     int cod_op; //0: criacao; 1: exclusao;
@@ -24,8 +23,7 @@ public:
 
 };
 
-class Processo
-{
+class Processo {
 public:
     //informacoes basicas
     int PID;
@@ -74,18 +72,12 @@ public:
     static void le_Arquivo_Operacoes(const string &filename);
 
     /*Definição do operator < para realizar o sort entre processos*/
-    friend bool operator<(Processo processo_1, Processo processo_2)
-    {
-        if(processo_1.prioridade_base == Processo::TEMPO_REAL)
-        {
+    friend bool operator<(Processo processo_1, Processo processo_2) {
+        if(processo_1.prioridade_base == Processo::TEMPO_REAL) {
             return true;
-        }
-        else if(processo_2.prioridade_base == Processo::TEMPO_REAL)
-        {
+        } else if(processo_2.prioridade_base == Processo::TEMPO_REAL) {
             return false;
-        }
-        else
-        {
+        } else {
             return processo_1.prioridade_variavel < processo_2.prioridade_variavel;
         }
     }

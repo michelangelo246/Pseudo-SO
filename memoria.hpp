@@ -9,8 +9,7 @@
 
 using namespace std;
 
-class Memoria
-{
+class Memoria {
 public:
 
     static bool RAM[1024];

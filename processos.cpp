@@ -6,17 +6,17 @@ list<Processo*> Processo::fila_prontos[4];
 list<Processo*> Processo::fila_bloqueados;
 int Processo::tempo_decorrido = 0;
 
-Processo::~Processo()
-{
+Processo::~Processo() {
     Recursos::Desaloca(this->recursos);
     Memoria::Desaloca(this->offset, this->qtd_blocos);
     this->lista_operacoes.clear();
 }
 
 /*Retorna o processo pelo PID ou nullptr caso ele nao exista*/
-Processo *Processo::Get(int PID)
-{
-    for(auto process : Processo::processos_lidos) if(process->PID == PID) return process;
+Processo *Processo::Get(int PID) {
+    for(auto process : Processo::processos_lidos)
+        if(process->PID == PID)
+            return process;
 
     // for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
     // {
@@ -28,22 +28,14 @@ Processo *Processo::Get(int PID)
     return nullptr;
 }
 
-bool Processo::Terminou()
-{
-    if(!Processo::fila_bloqueados.empty())
-    {
+bool Processo::Terminou() {
+    if(!Processo::fila_bloqueados.empty()) {
         return false;
-    }
-    else if(!Processo::processos_lidos.empty())
-    {
+    } else if(!Processo::processos_lidos.empty()) {
         return false;
-    }
-    else
-    {
-        for(int i=0; i<4; i++)
-        {
-            if(!Processo::fila_prontos[i].empty())
-            {
+    } else {
+        for(int i=0; i<4; i++) {
+            if(!Processo::fila_prontos[i].empty()) {
                 return false;
             }
         }
@@ -52,8 +44,7 @@ bool Processo::Terminou()
 }
 
 /*Le arquivos de operações (somente parte de operacoes), inserindo as operacoes na lista do processo correspondente e inicializa a memoria*/
-void Processo::le_Arquivo_Operacoes(const string &filename)
-{
+void Processo::le_Arquivo_Operacoes(const string &filename) {
     //le arquivo de operacoes
     ifstream arquivo(filename);
     string linha;
@@ -65,26 +56,20 @@ void Processo::le_Arquivo_Operacoes(const string &filename)
     //inicializa memoria
     Memoria::Inicializa();
 
-    if (arquivo.is_open())
-    {
-        for(int i=0; i<5; i++)
-        {
+    if (arquivo.is_open()) {
+        for(int i=0; i<5; i++) {
             getline (arquivo,linha);
         }
-        while(getline (arquivo,linha))
-        {
+        while(getline (arquivo,linha)) {
             istringstream in(linha);
 
             in >> raw_operacoes[0] >> c;
             in >> raw_operacoes[1] >> c;
             in >> tmp >> c;
-            if(raw_operacoes[1] == 0)
-            {
+            if(raw_operacoes[1] == 0) {
                 in >> raw_operacoes[3] >> c;
                 in >> raw_operacoes[4] >> c;
-            }
-            else
-            {
+            } else {
                 in >> raw_operacoes[3] >> c;
             }
 
@@ -92,17 +77,13 @@ void Processo::le_Arquivo_Operacoes(const string &filename)
             operacao.cod_op = raw_operacoes[1];
             operacao.nome_arquivo = tmp;
             //se operacao de criar
-            if(operacao.cod_op == 0)
-            {
+            if(operacao.cod_op == 0) {
                 operacao.qtd_blocos = raw_operacoes[3];
                 operacao.tempo_de_efetivacao = raw_operacoes[4];
-            }
-            else
-            {
+            } else {
                 operacao.tempo_de_efetivacao = raw_operacoes[3];
             }
-            if(Processo::Get(raw_operacoes[0]) == nullptr)
-            {
+            if(Processo::Get(raw_operacoes[0]) == nullptr) {
                 cout << "\n\tfoi definida operacao no arquivo " << filename << " para processo que nao existe";
                 exit(-1);
             }
@@ -113,8 +94,7 @@ void Processo::le_Arquivo_Operacoes(const string &filename)
 }
 
 /*Le arquivo de processos e os insere em uma lista de processos lidos*/
-void Processo::le_Arquivo_Processo(const string &filename)
-{
+void Processo::le_Arquivo_Processo(const string &filename) {
     ifstream arquivo(filename);
     Processo *processo;
     string linha;
@@ -122,14 +102,11 @@ void Processo::le_Arquivo_Processo(const string &filename)
     int pid = 0;
     char c;
 
-    if (arquivo.is_open())
-    {
-        while( getline (arquivo,linha))
-        {
+    if (arquivo.is_open()) {
+        while( getline (arquivo,linha)) {
             istringstream in(linha);
 
-            for(int i=0; i<8; i++)
-            {
+            for(int i=0; i<8; i++) {
                 in >> raw_processo[i] >> c;
             }
 
@@ -143,8 +120,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
             //recursos
             processo->recursos[Processo::scanner] = raw_processo[5];
             processo->recursos[Processo::modem] = raw_processo[6];
-            switch(raw_processo[4])
-            {
+            switch(raw_processo[4]) {
             case 0:
                 processo->recursos[Processo::impressora_1] = false;
                 processo->recursos[Processo::impressora_2] = false;
@@ -158,8 +134,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
                 processo->recursos[Processo::impressora_2] = true;
                 break;
             }
-            switch(raw_processo[7])
-            {
+            switch(raw_processo[7]) {
             case 0:
                 processo->recursos[Processo::SATA_1] = false;
                 processo->recursos[Processo::SATA_2] = false;
@@ -184,8 +159,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
     }
 }
 
-void Processo::imprime_Processo(Processo *processo)
-{
+void Processo::imprime_Processo(Processo *processo) {
     cout << "dispatcher =>";
     cout << "\n\t Hora de criacao:   " << Processo::tempo_decorrido;
     cout << "\n\t PID:               " << processo->PID;
@@ -205,37 +179,29 @@ void Processo::imprime_Processo(Processo *processo)
 }
 
 /*Verifica se processo pode alocar os recursos e a memoria necessarios para executar*/
-bool Processo::Pode_executar(Processo *processo)
-{
-    if(!Memoria::Pode_alocar(processo->prioridade_base, processo->qtd_blocos))
-    {
+bool Processo::Pode_executar(Processo *processo) {
+    if(!Memoria::Pode_alocar(processo->prioridade_base, processo->qtd_blocos)) {
         return false;
     }
-    if(!Recursos::Pode_alocar(processo->recursos))
-    {
+    if(!Recursos::Pode_alocar(processo->recursos)) {
         return false;
     }
     return true;
 }
 
 /*verifica se o processo executou o tempo maximo determinado*/
-bool Processo::terminou()
-{
+bool Processo::terminou() {
     return this->tempo_executado == this->tempo_processador;
 }
 
 /*Move processos de usuario que estao esperando ha um tempo para filas com maior prioridade*/
-void Processo::Priority_Boost()
-{
+void Processo::Priority_Boost() {
     //so pode mover processo de usuario (>1) que nao esta no maior nivel de prioridade variavel
-    for(int i=2; i<4; i++)
-    {
-        for(auto it = Processo::fila_prontos[i].begin(); it != Processo::fila_prontos[i].end();)
-        {
+    for(int i=2; i<4; i++) {
+        for(auto it = Processo::fila_prontos[i].begin(); it != Processo::fila_prontos[i].end();) {
             auto processo = *it;
             //se processo esta esperando ha muito tempo
-            if(processo->tempo_esperando >= Processo::WAIT_TIME)
-            {
+            if(processo->tempo_esperando >= Processo::WAIT_TIME) {
                 //reseta tempo de espera do processo movido
                 processo->tempo_esperando = 0;
                 //coloca processo na fila de maior prioridade
@@ -244,9 +210,7 @@ void Processo::Priority_Boost()
                 processo->prioridade_variavel = i-1;
                 //tira processo da fila atual
                 it = Processo::fila_prontos[i].erase(it);
-            }
-            else
-            {
+            } else {
                 //evita incremento duplicado devido ao erase
                 it++;
             }
@@ -255,19 +219,14 @@ void Processo::Priority_Boost()
 }
 
 /*Move processos lidos para as filas de prontos ou bloqueados, se for na de prontos, aloca os recursos necessarios*/
-void Processo::Inicializa()
-{
-    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end();)
-    {
+void Processo::Inicializa() {
+    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end();) {
         auto processo = *it;
         //se esta na hora de inicializar o processo
-        if(Processo::tempo_decorrido >= processo->tempo_inicializacao)
-        {
+        if(Processo::tempo_decorrido >= processo->tempo_inicializacao) {
             //se processo tem tudo o que precisa para executar, vai para fila de prontos
-            if(Processo::Pode_executar(processo))
-            {
-                if(processo->prioridade_base == Processo::TEMPO_REAL)
-                {
+            if(Processo::Pode_executar(processo)) {
+                if(processo->prioridade_base == Processo::TEMPO_REAL) {
                     Processo::fila_prontos[0].push_back(processo);
                     //aloca os recursos e memoria para o processo movido para a fila de prontos
                     Recursos::Aloca(processo->recursos);
@@ -282,9 +241,7 @@ void Processo::Inicializa()
                     //inicializar um processo consome um clock do processador
                     Processo::tempo_decorrido++;
                     break;
-                }
-                else
-                {
+                } else {
                     Processo::fila_prontos[processo->prioridade_base].push_back(processo);
                 }
                 //aloca os recursos e memoria para o processo movido para a fila de prontos
@@ -295,8 +252,7 @@ void Processo::Inicializa()
                 Processo::imprime_Processo(processo);
             }
             //senao, vai para a fila de bloqueados
-            else
-            {
+            else {
                 Processo::fila_bloqueados.push_back(processo);
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
@@ -305,36 +261,28 @@ void Processo::Inicializa()
             it = Processo::processos_lidos.erase(it);
             //inicializar um processo consome um clock do processador
             Processo::tempo_decorrido++;
-        }
-        else
-        {
+        } else {
             it++;
         }
     }
 }
 
 /*Itera sobre a fila de bloqueados, movendo-os para a de prontos caso seja possivel e aloca os recursos ao faze-lo*/
-void Processo::Verifica_Bloquados()
-{
+void Processo::Verifica_Bloquados() {
     //ordena por prioridade, pois tem que tirar da fila de bloqueados aquele que tem maior prioridade
     Processo::fila_bloqueados.sort();
 
-    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++)
-    {
+    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++) {
         auto processo = *it;
         //se processo tem tudo o que precisa para executar, vai para fila de prontos
-        if(Processo::Pode_executar(processo))
-        {
+        if(Processo::Pode_executar(processo)) {
             //coloca processo na fila de pronto de acordo com a prioridade
-            if(processo->prioridade_base == Processo::TEMPO_REAL)
-            {
+            if(processo->prioridade_base == Processo::TEMPO_REAL) {
                 //insere na fila de prontos de processo de tempo real
                 Processo::fila_prontos[0].push_back(processo);
                 //remove da fila de bloqueados
                 it = Processo::fila_bloqueados.erase(it);
-            }
-            else
-            {
+            } else {
                 //insere na fila de prontos de usuario de acordo com a prioridade
                 Processo::fila_prontos[processo->prioridade_variavel].push_back(processo);
                 //remove da fila de bloqueados

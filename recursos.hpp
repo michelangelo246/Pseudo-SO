@@ -9,8 +9,7 @@
 
 using namespace std;
 
-class Recursos
-{
+class Recursos {
 public:
 
     static enum { scanner_1, scanner_2, impressora_1, impressora_2, modem, SATA_1, SATA_2 } kind;
