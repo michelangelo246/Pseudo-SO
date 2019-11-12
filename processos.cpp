@@ -245,7 +245,7 @@ void Processo::Priority_Boost()
 /*Move processos lidos para as filas de prontos ou bloqueados, se for na de prontos, aloca os recursos necessarios*/
 void Processo::Inicializa()
 {
-    for(list<Processo*>::iterator it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
+    for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
     {
         //se esta na hora de inicializar o processo
         if(Processo::tempo_decorrido == (*it)->tempo_inicializacao)
@@ -284,7 +284,7 @@ void Processo::Verifica_Bloquados()
 {
     Processo::fila_bloqueados.sort();
 
-    for(list<Processo*>::iterator it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++)
+    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++)
     {
         //se processo tem tudo o que precisa para executar, vai para fila de prontos
         if(Processo::Pode_executar(*it))

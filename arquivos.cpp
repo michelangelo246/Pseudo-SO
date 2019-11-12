@@ -161,6 +161,7 @@ void Arquivo::executa(int PID,int cod_op, char nome_arquivo, int qtd_blocos, int
                     arquivo->nome = nome_arquivo;
                     arquivo->offset = aux;
                     arquivo->qtd_blocos = qtd_blocos;
+                    arquivo->PID_owner = PID;
                     Arquivo::arquivos.push_back(arquivo);
                     cout << "PID: " << PID << " - instruction " << tempo_executado << " - SUCCESS (IO)" << endl;
                     cout << "O processo criou o arquivo " << arquivo->nome ;
