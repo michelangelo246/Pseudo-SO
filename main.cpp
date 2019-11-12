@@ -9,7 +9,7 @@ void executa_prox_op(Processo *processo)
     if(!processo->lista_operacoes.empty())
     {
         //se esta na hora de executar a prox operacao
-        if(processo->tempo_executado >= processo->lista_operacoes.front().tempo_de_efetivacao)
+        if(processo->tempo_executado == processo->lista_operacoes.front().tempo_de_efetivacao)
         {
             Arquivo::executa(processo->PID,processo->lista_operacoes.front().cod_op,
                     processo->lista_operacoes.front().nome_arquivo, processo->lista_operacoes.front().qtd_blocos,
@@ -26,6 +26,7 @@ void executa_prox_op(Processo *processo)
     {
         cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - SUCCESS (CPU)"<< endl << endl;
     }
+    processo->tempo_executado++;
 }
 
 /*percorre filas de prontos, executa a operacao daquele que possui maior prioridade e o insere no final da fila*/

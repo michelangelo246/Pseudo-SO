@@ -29,10 +29,12 @@ bool Processo::Terminou()
 {
     if(!Processo::fila_bloqueados.empty())
     {
+        cout <<"tem bloquado";
         return false;
     }
     else if(!Processo::processos_lidos.empty())
     {
+        cout <<"tem lido";
         return false;
     }
     else
@@ -41,6 +43,7 @@ bool Processo::Terminou()
         {
             if(!Processo::fila_prontos[i].empty())
             {
+                cout <<"tem pronto";
                 return false;
             }
         }
@@ -255,7 +258,7 @@ void Processo::Inicializa()
     for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end();)
     {
         //se esta na hora de inicializar o processo
-        if(Processo::tempo_decorrido == (*it)->tempo_inicializacao)
+        if(Processo::tempo_decorrido <= (*it)->tempo_inicializacao)
         {
             //se processo tem tudo o que precisa para executar, vai para fila de prontos
             if(Processo::Pode_executar(*it))
@@ -289,7 +292,6 @@ void Processo::Inicializa()
         {
             it++;
         }
-        
     }
 }
 
