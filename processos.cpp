@@ -248,7 +248,7 @@ void Processo::Inicializa()
     for(list<Processo*>::iterator it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
     {
         //se esta na hora de inicializar o processo
-        if(Processo::tempo_decorrido >= (*it)->tempo_inicializacao)
+        if(Processo::tempo_decorrido == (*it)->tempo_inicializacao)
         {
             //se processo tem tudo o que precisa para executar, vai para fila de prontos
             if(Processo::Pode_executar(*it))

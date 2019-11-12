@@ -83,7 +83,7 @@ int Memoria::Aloca(int prioridade, int qtd_blocos)
     {
         for(int i=0; i<USER_OFFSET; i++)
         {
-            //encontrou segmento livre
+            //encontrou bloco livre
             if(Memoria::RAM[i] == false)
             {
                 cabe = true;
