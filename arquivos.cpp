@@ -57,7 +57,6 @@ void Arquivo::Imprime() {
                     for(int j=0; j<arquivo->qtd_blocos; j++) {
                         cout << arquivo->nome << "|";
                     }
-                    i = arquivo->offset + arquivo->qtd_blocos;
                     break;
                 }
             }
