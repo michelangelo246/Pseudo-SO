@@ -8,7 +8,7 @@ int Processo::tempo_decorrido = 0;
 Processo::~Processo()
 {
     Recursos::Desaloca(this->recursos);
-    Memoria::Desaloca(this->endereco, this->qtd_blocos);
+    Memoria::Desaloca(this->offset, this->qtd_blocos);
     this->lista_operacoes.clear();
 }
 
@@ -170,7 +170,7 @@ void Processo::le_Arquivo_Processo(const string &filename)
                 break;
             }
             //default
-            processo->endereco = -1;
+            processo->offset = -1;
             processo->tempo_executado = 0;
             processo->tempo_esperando = 0;
             processo->prioridade_variavel = 3;
@@ -185,7 +185,7 @@ void Processo::imprime_Processo(Processo *processo)
     cout << "dispatcher =>";
     cout << "\n\t Hora de criacao:   " << Processo::tempo_decorrido;
     cout << "\n\t PID:               " << processo->PID;
-    cout << "\n\t offset:            " << processo->endereco;
+    cout << "\n\t offset:            " << processo->offset;
     cout << "\n\t blocks:            " << processo->qtd_blocos;
     cout << "\n\t base priority:     " << processo->prioridade_base;
     cout << "\n\t relative priority: " << processo->prioridade_variavel;
@@ -263,7 +263,7 @@ void Processo::Inicializa()
                 }
                 //aloca os recursos e memoria para o processo movido para a fila de prontos
                 Recursos::Aloca((*it)->recursos);
-                (*it)->endereco = Memoria::Aloca((*it)->prioridade_base, (*it)->qtd_blocos);
+                (*it)->offset = Memoria::Aloca((*it)->prioridade_base, (*it)->qtd_blocos);
 
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo((*it));
@@ -272,6 +272,8 @@ void Processo::Inicializa()
             else
             {
                 Processo::fila_bloqueados.push_back(*it);
+                //imprime processo pelo dispatcher apos inicializa-lo
+                Processo::imprime_Processo((*it));
             }
             //tira da fila de processos lidos
             it = Processo::processos_lidos.erase(it);
@@ -282,6 +284,7 @@ void Processo::Inicializa()
 /*Itera sobre a fila de bloqueados, movendo-os para a de prontos caso seja possivel e aloca os recursos ao faze-lo*/
 void Processo::Verifica_Bloquados()
 {
+    //ordena por prioridade, pois tem que tirar da fila de bloqueados aquele que tem maior prioridade
     Processo::fila_bloqueados.sort();
 
     for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++)
@@ -289,23 +292,24 @@ void Processo::Verifica_Bloquados()
         //se processo tem tudo o que precisa para executar, vai para fila de prontos
         if(Processo::Pode_executar(*it))
         {
+            //coloca processo na fila de pronto de acordo com a prioridade
             if((*it)->prioridade_base == Processo::TEMPO_REAL)
             {
-                //insere na fila de prontos
+                //insere na fila de prontos de processo de tempo real
                 Processo::fila_prontos[0].push_back(*it);
                 //remove da fila de bloqueados
                 it = Processo::fila_bloqueados.erase(it);
             }
             else
             {
-                //insere na fila de prontos
+                //insere na fila de prontos de usuario de acordo com a prioridade
                 Processo::fila_prontos[(*it)->prioridade_variavel].push_back(*it);
                 //remove da fila de bloqueados
                 it = Processo::fila_bloqueados.erase(it);
             }
             //aloca os recursos e memoria para o processo movido para a fila de prontos
             Recursos::Aloca((*it)->recursos);
-            (*it)->endereco = Memoria::Aloca((*it)->prioridade_base, (*it)->qtd_blocos);
+            (*it)->offset = Memoria::Aloca((*it)->prioridade_base, (*it)->qtd_blocos);
         }
     }
 }

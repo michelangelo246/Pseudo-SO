@@ -54,9 +54,16 @@ void Executa()
             //executa operacoes; se for de tempo real, todas; se for de usuario, ate o quantum acabar;
             if(processo->prioridade_base == Processo::TEMPO_REAL)
             {
+                //necessario para evitar incremento excedente do tempo_decorrido
+                if(!processo->terminou())
+                {
+                    Processo::tempo_decorrido--;
+                }
                 while(!processo->terminou())
                 {
                     executa_prox_op(processo);
+                    //cada execução consome um tempo de clock
+                    Processo::tempo_decorrido++;
                 }
             }
             else
@@ -95,16 +102,17 @@ void Executa()
 
 int main(int argc, char **argv)
 {
-    Processo::le_Arquivo_Processo(argv[1]);
     Arquivo::Inicializa(argv[2]);
+    Processo::le_Arquivo_Processo(argv[1]);
+    Arquivo::le_Arquivo_Operacoes(argv[2]);
     Processo::le_Arquivo_Operacoes(argv[2]);
 
     //loop principal: 
     // 1. inicializa processos caso seja a hora
     // 2. move processos bloquados para a fila de prontos caso possivel
     // 3. executa processo pronto de maior prioridade
-    // 4. envia processo de usuario para o fim da mesma fila apos executar
-    // 5. aumenta a prioridade dos processos que nao conseguiram executar
+    // 3.1. envia processo de usuario para o fim da mesma fila apos executar
+    // 3.2. aumenta a prioridade dos processos que nao conseguiram executar
     do{
         Processo::Inicializa();
         Processo::Verifica_Bloquados();
@@ -115,6 +123,7 @@ int main(int argc, char **argv)
 
     //Exibe estado final do sistema de arquivos
     Arquivo::Imprime();
+    Arquivo::Free();
 
     return 0;
 }

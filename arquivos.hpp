@@ -33,6 +33,7 @@ public:
     static void Inicializa(const string &filename);
     static void Imprime();
     static void le_Arquivo_Operacoes(const string &filename);
+    static void Free();
     static Arquivo* Get(char filename);
 
 };

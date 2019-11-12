@@ -34,7 +34,7 @@ public:
     int prioridade_variavel;
     int tempo_executado;
     int tempo_processador;
-    int endereco;
+    int offset;
     int qtd_blocos;
     int tempo_esperando;
 

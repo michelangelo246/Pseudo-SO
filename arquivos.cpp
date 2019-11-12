@@ -105,8 +105,6 @@ void Arquivo::Inicializa(const string &filename)
     {
         HD[i] = false;
     }
-
-    Arquivo::le_Arquivo_Operacoes(filename);
 }
 
 /*Retorna o arquivo com o nome especificado ou NULL caso o arquivo nao exista*/
@@ -224,4 +222,10 @@ void Arquivo::executa(int PID,int cod_op, char nome_arquivo, int qtd_blocos, int
         }
         break;
     }
+}
+
+void Arquivo::Free()
+{
+    free(HD);
+    HD = NULL;
 }
