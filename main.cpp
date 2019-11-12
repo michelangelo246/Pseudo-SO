@@ -80,8 +80,8 @@ void Executa() {
             }
             //processo de usuario nao terminou pois foi preemptado por esgotamento de quantum
             else {
-                cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - FAIL";
-                cout << "\nO quantum de processamento foi esgotado!" << endl << endl;
+                // cout << "PID: " << processo->PID << " - instruction " << processo->tempo_executado << " - FAIL";
+                // cout << "\nO quantum de processamento foi esgotado!" << endl << endl;
                 Processo::fila_prontos[processo->prioridade_base].push_back(processo);
             }
             break;
