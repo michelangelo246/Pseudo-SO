@@ -243,12 +243,14 @@ void Processo::Inicializa() {
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
             }
-            //senao, vai para a fila de bloqueados
-            else {
+            //senao, vai para a fila de bloqueados se for possivel executar em algum momento
+            else if(Memoria::Possivel_alocar(processo->prioridade_base, processo->qtd_blocos)) {
                 // 'fila_bloqueados' é um set de pares, portanto ele se mantém ordenado por ordem do primeiro elemento, que é a prioridade
-                Processo::fila_bloqueados.emplace(-processo->prioridade_base, processo);
+                Processo::fila_bloqueados.emplace(processo->prioridade_base, processo);
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
+            } else {
+                cout << "PID " << processo->PID << " requer mais memória do que o sistema possui" << endl;
             }
             //tira da fila de processos lidos
             it = Processo::processos_lidos.erase(it);
@@ -263,26 +265,20 @@ void Processo::Inicializa() {
 /*Itera sobre a fila de bloqueados, movendo-os para a de prontos caso seja possivel e aloca os recursos ao faze-lo*/
 void Processo::Verifica_Bloquados() {
     //ordena por prioridade, pois tem que tirar da fila de bloqueados aquele que tem maior prioridade
-    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++) {
-        auto processo = (*it).second;
+    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end();) {
+        auto processo = it->second;
         //se processo tem tudo o que precisa para executar, vai para fila de prontos
         if(Processo::Pode_executar(processo)) {
-            //TODO: precisa desse if?
-            //coloca processo na fila de pronto de acordo com a prioridade
-            if(processo->prioridade_base == Processo::TEMPO_REAL) {
-                //insere na fila de prontos de processo de tempo real
-                Processo::fila_prontos[0].push_back(processo);
-                //remove da fila de bloqueados
-                it = Processo::fila_bloqueados.erase(it);
-            } else {
-                //insere na fila de prontos de usuario de acordo com a prioridade
-                Processo::fila_prontos[processo->prioridade_variavel].push_back(processo);
-                //remove da fila de bloqueados
-                it = Processo::fila_bloqueados.erase(it);
-            }
+            //insere na fila de prontos de acordo com a prioridade
+            Processo::fila_prontos[processo->prioridade_variavel].push_back(processo);
+            //remove da fila de bloqueados
+            it = Processo::fila_bloqueados.erase(it);
             //aloca os recursos e memoria para o processo movido para a fila de prontos
             Recursos::Aloca(processo->recursos);
             processo->offset = Memoria::Aloca(processo->prioridade_base, processo->qtd_blocos);
+        }
+        else{
+            it++;
         }
     }
 }

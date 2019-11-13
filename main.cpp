@@ -76,7 +76,7 @@ void Executa() {
                 } else {
                     cout << "\nO processo " << processo->PID << " executou todas as suas operacoes! " << endl << endl;
                 }
-                delete(processo);
+                delete processo;
             }
             //processo de usuario nao terminou pois foi preemptado por esgotamento de quantum
             else {
