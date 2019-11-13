@@ -17,6 +17,7 @@ public:
     static const int TAM_MEMORIA = 1024;
 
     static bool RAM[TAM_MEMORIA];
+    static int candidato_alocacao;
 
     static void Inicializa();
     static bool Pode_alocar(int prioridade, int qtd_blocos);

@@ -3,7 +3,7 @@
 
 list<Processo*> Processo::processos_lidos;
 list<Processo*> Processo::fila_prontos[4];
-set<pair<int, Processo*>> Processo::fila_bloqueados; // usando set para mante-la ordenada pela prioridade
+list<Processo*> Processo::fila_bloqueados[4]; // usando varias filas para manter os processos ordenados pela prioridade
 int Processo::tempo_decorrido = 0;
 
 Processo::~Processo() {
@@ -21,11 +21,11 @@ Processo *Processo::Get(int PID) {
 }
 
 bool Processo::Terminou() {
-    if(not (Processo::fila_bloqueados.empty() and Processo::processos_lidos.empty())) {
+    if(not Processo::processos_lidos.empty()) {
         return false;
     } else {
         for(int i=0; i<4; i++) {
-            if(!Processo::fila_prontos[i].empty()) {
+            if(!Processo::fila_prontos[i].empty() or !Processo::fila_bloqueados[i].empty()) {
                 return false;
             }
         }
@@ -210,39 +210,32 @@ void Processo::Inicializa() {
         if(Processo::tempo_decorrido >= processo->tempo_inicializacao) {
             //se processo tem tudo o que precisa para executar, vai para fila de prontos
             if(Processo::Pode_executar(processo)) {
-                if(processo->prioridade_base == Processo::TEMPO_REAL) {
-                    Processo::fila_prontos[0].push_back(processo);
-                    //aloca os recursos e memoria para o processo movido para a fila de prontos
-                    Recursos::Aloca(processo->recursos);
-                    processo->offset = Memoria::Aloca(processo->prioridade_base, processo->qtd_blocos);
+                Processo::fila_prontos[processo->prioridade_base].push_back(processo);
 
-                    //imprime processo pelo dispatcher apos inicializa-lo
-                    Processo::imprime_Processo(processo);
-
-                    //tira da fila de processos lidos
-                    it = Processo::processos_lidos.erase(it);
-
-                    //inicializar um processo consome um clock do processador
-                    Processo::tempo_decorrido++;
-                    break;
-                } else {
-                    Processo::fila_prontos[processo->prioridade_base].push_back(processo);
-                }
                 //aloca os recursos e memoria para o processo movido para a fila de prontos
                 Recursos::Aloca(processo->recursos);
                 processo->offset = Memoria::Aloca(processo->prioridade_base, processo->qtd_blocos);
 
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
+
+                //apos iniializar um processo de tempo real, para de checar processos para inicializar
+                if(processo->prioridade_base == Processo::TEMPO_REAL) {
+                    //tira da fila de processos lidos
+                    it = Processo::processos_lidos.erase(it);
+
+                    //inicializar um processo consome um clock do processador
+                    Processo::tempo_decorrido++;
+                    break;
+                }
             }
             //senao, vai para a fila de bloqueados se for possivel executar em algum momento
             else if(Memoria::Possivel_alocar(processo->prioridade_base, processo->qtd_blocos)) {
-                // 'fila_bloqueados' é um set de pares, portanto ele se mantém ordenado por ordem do primeiro elemento, que é a prioridade
-                Processo::fila_bloqueados.emplace(processo->prioridade_base, processo);
+                Processo::fila_bloqueados[processo->prioridade_base].push_back(processo);
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
             } else {
-                cout << "PID " << processo->PID << " requer mais memória do que o sistema possui" << endl;
+                cout << "PID " << processo->PID << " requer mais memória do que o sistema possui" << endl << endl;
             }
             //tira da fila de processos lidos
             it = Processo::processos_lidos.erase(it);
@@ -257,20 +250,22 @@ void Processo::Inicializa() {
 /*Itera sobre a fila de bloqueados, movendo-os para a de prontos caso seja possivel e aloca os recursos ao faze-lo*/
 void Processo::Verifica_Bloquados() {
     //ordena por prioridade, pois tem que tirar da fila de bloqueados aquele que tem maior prioridade
-    for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end();) {
-        auto processo = it->second;
-        //se processo tem tudo o que precisa para executar, vai para fila de prontos
-        if(Processo::Pode_executar(processo)) {
-            //insere na fila de prontos de acordo com a prioridade
-            Processo::fila_prontos[processo->prioridade_variavel].push_back(processo);
-            //remove da fila de bloqueados
-            it = Processo::fila_bloqueados.erase(it);
-            //aloca os recursos e memoria para o processo movido para a fila de prontos
-            Recursos::Aloca(processo->recursos);
-            processo->offset = Memoria::Aloca(processo->prioridade_base, processo->qtd_blocos);
-        }
-        else{
-            it++;
+    for(int prioridade = 0; prioridade < 4; prioridade++) {
+        for(auto it = Processo::fila_bloqueados[prioridade].begin(); it != Processo::fila_bloqueados[prioridade].end();) {
+            auto processo = *it;
+            //se processo tem tudo o que precisa para executar, vai para fila de prontos
+            if(Processo::Pode_executar(processo)) {
+                //insere na fila de prontos de acordo com a prioridade
+                Processo::fila_prontos[processo->prioridade_variavel].push_back(processo);
+                //remove da fila de bloqueados
+                it = Processo::fila_bloqueados[prioridade].erase(it);
+                //aloca os recursos e memoria para o processo movido para a fila de prontos
+                Recursos::Aloca(processo->recursos);
+                processo->offset = Memoria::Aloca(processo->prioridade_base, processo->qtd_blocos);
+            }
+            else{
+                it++;
+            }
         }
     }
 }

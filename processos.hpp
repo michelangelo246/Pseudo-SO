@@ -49,8 +49,8 @@ public:
     ~Processo();
 
     //Declaracoes estaticas
-    static list<Processo *> fila_prontos[4];
-    static set<pair<int, Processo*>> fila_bloqueados;
+    static list<Processo*> fila_prontos[4];
+    static list<Processo*> fila_bloqueados[4];
     static list<Processo*> processos_lidos;
 
     //tempo total decorrido no SO
@@ -59,8 +59,8 @@ public:
     //constantes
     static const int TEMPO_REAL = 0;
     static const int USUARIO = 1;
-    static const int QUANTUM = 4;
-    static const int WAIT_TIME = 1;
+    static const int QUANTUM = 1;
+    static const int WAIT_TIME = 10;
 
     static Processo *Get(int PID);
     static bool Pode_executar(Processo *processo);
