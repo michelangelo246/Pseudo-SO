@@ -14,17 +14,11 @@ Processo::~Processo() {
 
 /*Retorna o processo pelo PID ou nullptr caso ele nao exista*/
 Processo *Processo::Get(int PID) {
-    for(auto process : Processo::processos_lidos)
-        if(process->PID == PID)
+    for(auto process : Processo::processos_lidos){
+        if(process->PID == PID){
             return process;
-
-    // for(auto it = Processo::processos_lidos.begin(); it != Processo::processos_lidos.end(); it++)
-    // {
-    //     if((*it)->PID == PID)
-    //     {
-    //         return (*it);
-    //     }
-    // }
+        }
+    }
     return nullptr;
 }
 
