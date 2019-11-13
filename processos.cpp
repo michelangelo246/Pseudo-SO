@@ -14,11 +14,9 @@ Processo::~Processo() {
 
 /*Retorna o processo pelo PID ou nullptr caso ele nao exista*/
 Processo *Processo::Get(int PID) {
-    for(auto process : Processo::processos_lidos){
-        if(process->PID == PID){
+    for(auto process : Processo::processos_lidos)
+        if(process->PID == PID)
             return process;
-        }
-    }
     return nullptr;
 }
 
@@ -172,13 +170,7 @@ void Processo::imprime_Processo(Processo *processo) {
 
 /*Verifica se processo pode alocar os recursos e a memoria necessarios para executar*/
 bool Processo::Pode_executar(Processo *processo) {
-    if(!Memoria::Pode_alocar(processo->prioridade_base, processo->qtd_blocos)) {
-        return false;
-    }
-    if(!Recursos::Pode_alocar(processo->recursos)) {
-        return false;
-    }
-    return true;
+    return Memoria::Pode_alocar(processo->prioridade_base, processo->qtd_blocos) and Recursos::Pode_alocar(processo->recursos);
 }
 
 /*verifica se o processo executou o tempo maximo determinado*/
