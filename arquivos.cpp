@@ -57,7 +57,6 @@ void Arquivo::Imprime() {
                     for(int j=0; j<arquivo->qtd_blocos; j++) {
                         cout << arquivo->nome << "|";
                     }
-                    i = arquivo->offset + arquivo->qtd_blocos;
                     break;
                 }
             }
@@ -95,7 +94,7 @@ Arquivo* Arquivo::Get(char filename) {
 /*Executa a operacao no topo da pilha de operacoes do processo*/
 void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, int tempo_de_efetivacao, int tempo_executado, int prioridade_base) {
     Arquivo *arquivo = nullptr;
-    int cabe, aux;
+    int cabe;
 
     switch(cod_op) {
     case Arquivo::CRIAR:
@@ -114,13 +113,11 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
                 }
                 //se percorreu os blocos e cabe
                 if(cabe == true) {
-                    aux = i;
                     //aloca os espacos e cria o arquivo
-                    for(int j=0; j<qtd_blocos; j++)
-                        HD[i++] = true;
+                    memset(HD + i, true, qtd_blocos * sizeof(bool));
                     arquivo = new Arquivo();
                     arquivo->nome = nome_arquivo;
-                    arquivo->offset = aux;
+                    arquivo->offset = i;
                     arquivo->qtd_blocos = qtd_blocos;
                     arquivo->PID_owner = PID;
                     Arquivo::arquivos.push_back(arquivo);

@@ -7,6 +7,7 @@
 #include <queue>
 #include <list>
 #include <sstream>
+#include <set>
 #include "stdlib.h"
 #include "memoria.hpp"
 #include "recursos.hpp"
@@ -49,7 +50,7 @@ public:
 
     //Declaracoes estaticas
     static list<Processo *> fila_prontos[4];
-    static list<Processo*> fila_bloqueados;
+    static set<pair<int, Processo*>> fila_bloqueados;
     static list<Processo*> processos_lidos;
 
     //tempo total decorrido no SO
