@@ -64,7 +64,7 @@ void Arquivo::Inicializa(const string &filename) {
     in1 >> hd_size;
     Arquivo::HD_SIZE = hd_size;
     //inicia espacos do HD como livres
-    Arquivo::HD = (char*)calloc(hd_size, sizeof(char));
+    Arquivo::HD = new char[hd_size];
     memset(Arquivo::HD, Arquivo::VAZIO, hd_size * sizeof(char));
 }
 
@@ -152,6 +152,6 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
 }
 
 void Arquivo::Free() {
-    free(HD);
+    delete[] HD;
     HD = nullptr;
 }
