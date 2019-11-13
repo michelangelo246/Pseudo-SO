@@ -2,13 +2,13 @@
 #include "processos.hpp"
 #include <string.h>
 list<Arquivo*> Arquivo::arquivos;
-bool *Arquivo::HD;
+char *Arquivo::HD;
 int Arquivo::HD_SIZE = 0;
 
 /*Libera memoria alocada por arquivo*/
 Arquivo::~Arquivo() {
     //desaloca memoria ocupada pelo arquivo
-    memset(HD+this->offset, false, this->qtd_blocos * sizeof(bool));
+    memset(HD + this->offset, Arquivo::VAZIO, this->qtd_blocos * sizeof(char));
     //remove arquivo da lista de arquivos
     Arquivo::arquivos.remove(this);
 }
@@ -39,7 +39,7 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename) {
             in >> arquivo_tmp->nome >> c;
             in >> arquivo_tmp->offset >> c;
             in >> arquivo_tmp->qtd_blocos >> c;
-            memset(Arquivo::HD + arquivo_tmp->offset, true, arquivo_tmp-> qtd_blocos * sizeof(bool) );
+            memset(Arquivo::HD + arquivo_tmp->offset, arquivo_tmp->nome, arquivo_tmp-> qtd_blocos * sizeof(char));
             Arquivo::arquivos.push_back(arquivo_tmp);
 
             arquivo_tmp = nullptr;
@@ -49,21 +49,8 @@ void Arquivo::le_Arquivo_Operacoes(const string &filename) {
 
 /*Exibe estado atual do sistema de arquivos*/
 void Arquivo::Imprime() {
-
-    for(int i=0; i<Arquivo::HD_SIZE; i++) {
-        if(HD[i] == true) {
-            for(auto arquivo : Arquivo::arquivos) {
-                if(arquivo->offset == i) {
-                    for(int j=0; j<arquivo->qtd_blocos; j++) {
-                        cout << arquivo->nome << "|";
-                    }
-                    break;
-                }
-            }
-        } else {
-            cout << "_|";
-        }
-    }
+    for(int i = 0; i < Arquivo::HD_SIZE; i++) cout << Arquivo::HD[i] << "|";
+    cout << endl;
 }
 
 /*Inicializa espacos do HD*/
@@ -77,8 +64,8 @@ void Arquivo::Inicializa(const string &filename) {
     in1 >> hd_size;
     Arquivo::HD_SIZE = hd_size;
     //inicia espacos do HD como livres
-    Arquivo::HD = (bool*)calloc(hd_size, sizeof(bool));
-
+    Arquivo::HD = (char*)calloc(hd_size, sizeof(char));
+    memset(Arquivo::HD, Arquivo::VAZIO, hd_size * sizeof(char));
 }
 
 /*Retorna o arquivo com o nome especificado ou nullptr caso o arquivo nao exista*/
@@ -98,23 +85,23 @@ void Arquivo::executa(int PID, int cod_op, char nome_arquivo, int qtd_blocos, in
 
     switch(cod_op) {
     case Arquivo::CRIAR:
-        for(int i=0; i<Arquivo::HD_SIZE; i++) {
+        for(int i = 0; i < Arquivo::HD_SIZE; i++) {
             //encontrou segmento livre
-            if(HD[i] == false) {
+            if(HD[i] == Arquivo::VAZIO) {
                 cabe = true;
                 //ve se cabe arquivo
-                for(int j=0; j<qtd_blocos; j++) {
+                for(int j = 0; j < qtd_blocos; j++) {
                     //se nao cabe, continua procurando
-                    if((j+i) >= Arquivo::HD_SIZE or HD[j+i] == true) {
+                    if((j+i) >= Arquivo::HD_SIZE or HD[j+i] != Arquivo::VAZIO) {
                         i = j+i;
                         cabe = false;
                         break;
                     }
                 }
                 //se percorreu os blocos e cabe
-                if(cabe == true) {
+                if(cabe) {
                     //aloca os espacos e cria o arquivo
-                    memset(HD + i, true, qtd_blocos * sizeof(bool));
+                    memset(HD + i, nome_arquivo, qtd_blocos * sizeof(char));
                     arquivo = new Arquivo();
                     arquivo->nome = nome_arquivo;
                     arquivo->offset = i;
