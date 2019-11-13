@@ -3,7 +3,7 @@
 
 list<Processo*> Processo::processos_lidos;
 list<Processo*> Processo::fila_prontos[4];
-list<Processo*> Processo::fila_bloqueados;
+set<pair<int, Processo*>> Processo::fila_bloqueados; // usando set para mante-la ordenada pela prioridade
 int Processo::tempo_decorrido = 0;
 
 Processo::~Processo() {
@@ -23,9 +23,7 @@ Processo *Processo::Get(int PID) {
 }
 
 bool Processo::Terminou() {
-    if(!Processo::fila_bloqueados.empty()) {
-        return false;
-    } else if(!Processo::processos_lidos.empty()) {
+    if(not (Processo::fila_bloqueados.empty() and Processo::processos_lidos.empty())) {
         return false;
     } else {
         for(int i=0; i<4; i++) {
@@ -247,7 +245,8 @@ void Processo::Inicializa() {
             }
             //senao, vai para a fila de bloqueados
             else {
-                Processo::fila_bloqueados.push_back(processo);
+                // 'fila_bloqueados' é um set de pares, portanto ele se mantém ordenado por ordem do primeiro elemento, que é a prioridade
+                Processo::fila_bloqueados.emplace(-processo->prioridade_base, processo);
                 //imprime processo pelo dispatcher apos inicializa-lo
                 Processo::imprime_Processo(processo);
             }
@@ -264,12 +263,11 @@ void Processo::Inicializa() {
 /*Itera sobre a fila de bloqueados, movendo-os para a de prontos caso seja possivel e aloca os recursos ao faze-lo*/
 void Processo::Verifica_Bloquados() {
     //ordena por prioridade, pois tem que tirar da fila de bloqueados aquele que tem maior prioridade
-    Processo::fila_bloqueados.sort();
-
     for(auto it = Processo::fila_bloqueados.begin(); it != Processo::fila_bloqueados.end(); it++) {
-        auto processo = *it;
+        auto processo = (*it).second;
         //se processo tem tudo o que precisa para executar, vai para fila de prontos
         if(Processo::Pode_executar(processo)) {
+            //TODO: precisa desse if?
             //coloca processo na fila de pronto de acordo com a prioridade
             if(processo->prioridade_base == Processo::TEMPO_REAL) {
                 //insere na fila de prontos de processo de tempo real
